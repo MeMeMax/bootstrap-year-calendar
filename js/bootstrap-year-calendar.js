@@ -16,6 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================= */
+/*
+ * MODIFIED
+ */
  
  (function($) {
 	var Calendar = function(element, options) {
@@ -312,6 +315,12 @@
 						var monthData = [];
 					
 						for(var i in _this.options.dataSource) {
+							if(!(_this.options.dataSource[i].startDate instanceof Date)){
+								_this.options.dataSource[i].startDate = new Date(_this.options.dataSource[i].startDate);
+							}
+							if(!(_this.options.dataSource[i].endDate instanceof Date)){
+								_this.options.dataSource[i].endDate = new Date(_this.options.dataSource[i].endDate);
+							}
 							if(!(_this.options.dataSource[i].startDate > lastDate) || (_this.options.dataSource[i].endDate < firstDate)) {
 								monthData.push(_this.options.dataSource[i]);
 							}
@@ -320,17 +329,18 @@
 						if(monthData.length > 0) {
 							$(this).find('.day-content').each(function() {
 								var currentDate = new Date(_this.options.startYear, month, $(this).text());
+								var nextDate = new Date(currentDate.getTime());
+								nextDate = new Date(nextDate.setDate(currentDate.getDate()+1));
 								
 								var dayData = [];
 								
 								if((_this.options.minDate == null || currentDate >= _this.options.minDate) && (_this.options.maxDate == null || currentDate <= _this.options.maxDate))
 								{
 									for(var i in monthData) {
-										if(monthData[i].startDate <= currentDate && monthData[i].endDate >= currentDate) {
+										if(monthData[i].startDate >= currentDate && monthData[i].endDate <= nextDate) {
 											dayData.push(monthData[i]);
 										}
 									}
-									
 									if(dayData.length > 0)
 									{
 										_this._renderDataSourceDay($(this), currentDate, dayData);
@@ -771,10 +781,11 @@
 		},
 		getEvents: function(date) {
 			var events = [];
-			
+			var nextDate = new Date(date.getTime());
+			nextDate = new Date(nextDate.setDate(date.getDate()+1));
 			if(this.options.dataSource && date) {
 				for(var i in this.options.dataSource) {
-					if(this.options.dataSource[i].startDate <= date && this.options.dataSource[i].endDate >= date) {
+					if(this.options.dataSource[i].startDate >= date && this.options.dataSource[i].endDate <= nextDate) {
 						events.push(this.options.dataSource[i]);
 					}
 				}
